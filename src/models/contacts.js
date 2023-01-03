@@ -1,7 +1,7 @@
 import { readFile, writeFile } from "fs/promises";
 import { resolve } from "path";
 
-const contactsPath = resolve("./models/contacts.json");
+const contactsPath = resolve("./src/db/contacts.json");
 
 export async function listContacts() {
   try {
