@@ -1,24 +1,24 @@
-import { Router } from "express";
+import { Router } from 'express'
 import {
   postValidationMiddleware,
-  putValidationMiddleware,
-} from "../../middlewares/validationMiddlevares.js";
+  putValidationMiddleware
+} from '../../middlewares/validationMiddlevares.js'
 import {
   addNewContact,
   deleteContact,
   getContactsById,
   getContacts,
-  changeContact,
-} from "../../controllers/contactController.js";
+  changeContact
+} from '../../controllers/contactController.js'
 
-export const contactsRouter = new Router();
+export const contactsRouter = new Router()
 
-contactsRouter.get("/", getContacts);
+contactsRouter.get('/', getContacts)
 
-contactsRouter.get("/:contactId", getContactsById);
+contactsRouter.get('/:contactId', getContactsById)
 
-contactsRouter.post("/", postValidationMiddleware, addNewContact);
+contactsRouter.post('/', postValidationMiddleware, addNewContact)
 
-contactsRouter.delete("/:contactId", deleteContact);
+contactsRouter.delete('/:contactId', deleteContact)
 
-contactsRouter.put("/:contactId", putValidationMiddleware, changeContact);
+contactsRouter.put('/:contactId', putValidationMiddleware, changeContact)
