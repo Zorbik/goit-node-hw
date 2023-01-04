@@ -4,9 +4,11 @@ module.exports = {
     es2021: true,
     node: true,
   },
-  extends: ['standard', 'prettier'],
+  extends: ["standard", "prettier"],
+  overrides: [],
   parserOptions: {
-    ecmaVersion: 12,
+    ecmaVersion: "latest",
+    sourceType: "module",
   },
   rules: {},
-}
+};
