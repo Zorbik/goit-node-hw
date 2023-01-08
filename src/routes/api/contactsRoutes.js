@@ -1,24 +1,36 @@
-import { Router } from 'express'
+import { Router } from "express";
+import { validationMiddleware } from "../../middlewares/validationMiddlevares.js";
 import {
-  postValidationMiddleware,
-  putValidationMiddleware
-} from '../../middlewares/validationMiddlevares.js'
-import {
-  addNewContact,
-  deleteContact,
-  getContactsById,
-  getContacts,
-  changeContact
-} from '../../controllers/contactController.js'
+  addNewContactController,
+  deleteContactController,
+  getContactByIdController,
+  getContactsController,
+  changeContactController,
+  changeFavoriteController,
+} from "../../controllers/contactController.js";
+import { asyncWrapper } from "../../helpers/apiHelpers.js";
 
-export const contactsRouter = new Router()
+export const contactsRouter = new Router();
 
-contactsRouter.get('/', getContacts)
+contactsRouter.get("/", asyncWrapper(getContactsController));
 
-contactsRouter.get('/:contactId', getContactsById)
+contactsRouter.get("/:contactId", asyncWrapper(getContactByIdController));
 
-contactsRouter.post('/', postValidationMiddleware, addNewContact)
+contactsRouter.post(
+  "/",
+  validationMiddleware,
+  asyncWrapper(addNewContactController)
+);
 
-contactsRouter.delete('/:contactId', deleteContact)
+contactsRouter.delete("/:contactId", asyncWrapper(deleteContactController));
 
-contactsRouter.put('/:contactId', putValidationMiddleware, changeContact)
+contactsRouter.put(
+  "/:contactId",
+  validationMiddleware,
+  asyncWrapper(changeContactController)
+);
+
+contactsRouter.patch(
+  "/:contactId/favorite",
+  asyncWrapper(changeFavoriteController)
+);
