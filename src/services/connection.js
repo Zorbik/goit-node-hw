@@ -3,11 +3,11 @@ import dotenv from "dotenv";
 
 dotenv.config();
 
-export function connectMongo() {
+export async function connectMongo() {
   try {
-    mongoose.set("strictQuery", false);
+    await mongoose.set("strictQuery", false);
     mongoose.connect(process.env.MONGO_URL);
   } catch (error) {
-    console.log("err", error);
+    console.log("error", error);
   }
 }
