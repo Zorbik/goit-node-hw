@@ -10,6 +10,7 @@ export const validationMiddleware = (req, res, next) => {
       })
       .required(),
     phone: Joi.string().required(),
+    favorite: Joi.boolean(),
   });
 
   const validationData = schema.validate(req.body);

@@ -4,29 +4,35 @@ import {
   listContacts,
   removeContact,
   updateContact,
-  updateStatusContact,
 } from "../services/contactsService.js";
 
 export const getContactsController = async (req, res, next) => {
-  const contacts = await listContacts();
+  const { _id: userId } = req.user;
+  const { page, limit, favorite } = req.query;
+  const contacts = await listContacts(userId, page, limit, favorite);
   res.status(200).json({ contacts, status: "success" });
 };
 
 export const getContactByIdController = async (req, res, next) => {
-  const contact = await getContactById(req.params.contactId);
+  const { _id: userId } = req.user;
+  const { contactId } = req.params;
+  const contact = await getContactById(contactId, userId);
   res.status(200).json({ contact, status: "success" });
 };
 
 export const addNewContactController = async (req, res, next) => {
   const { name, email, phone } = req.body;
-  const contact = await addContact(name, email, phone);
+  const { _id: userId } = req.user;
+
+  const contact = await addContact({ name, email, phone }, userId);
 
   res.status(201).json({ contact, status: "success" });
 };
 
 export const deleteContactController = async (req, res, next) => {
+  const { _id: userId } = req.user;
   const { contactId } = req.params;
-  const response = await removeContact(contactId);
+  const response = await removeContact(contactId, userId);
   if (!response) {
     return res.status(400).json({
       message: "Not found",
@@ -36,40 +42,30 @@ export const deleteContactController = async (req, res, next) => {
 };
 
 export const changeContactController = async (req, res, next) => {
-  if (!Object.keys(req.body).length) {
-    return res.status(400).json({
-      message: "missing fields",
-    });
-  }
-
-  const updatedContact = await updateContact(req.params.contactId, req.body);
-
-  if (!updatedContact) {
-    res.status(400).json({
-      message: "Not found",
-    });
-  }
-
-  res.status(200).json({ updatedContact, status: "success" });
+  await updContact(req, res);
 };
 
 export const changeFavoriteController = async (req, res, next) => {
+  await updContact(req, res);
+};
+
+async function updContact(req, res) {
+  const { _id: userId } = req.user;
+
   if (!Object.keys(req.body).length) {
     return res.status(400).json({
       message: "missing fields",
     });
   }
+  const { contactId } = req.params;
 
-  const updatedContact = await updateStatusContact(
-    req.params.contactId,
-    req.body
-  );
+  const updatedContact = await updateContact(contactId, req.body, userId);
 
   if (!updatedContact) {
-    res.status(400).json({
+    return res.status(400).json({
       message: "Not found",
     });
   }
 
   res.status(200).json({ updatedContact, status: "success" });
-};
+}
