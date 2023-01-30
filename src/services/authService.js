@@ -1,6 +1,7 @@
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
 import dotenv from "dotenv";
+import gravatar from "gravatar";
 import { User } from "../models/userModel.js";
 import {
   NotAuthorizeError,
@@ -15,6 +16,7 @@ export async function registrateUser(email, password) {
     throw new RegistrationConflictError("Email in use");
   }
   const user = new User({ email, password });
+  user.avatarURL = gravatar.url(email, { s: 200, d: "monsterid" });
   await user.save();
   return { email, subscription: "starter" };
 }

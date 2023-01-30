@@ -35,3 +35,7 @@ export async function subscriptionController(req, res) {
     .status(200)
     .json({ user: { email: data.email, subscription: data.subscription } });
 }
+
+export async function avatarChangerController(req, res) {
+  res.status(200).json({ status: "success" });
+}

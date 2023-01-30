@@ -60,6 +60,7 @@ async function updContact(req, res) {
   const { contactId } = req.params;
 
   const updatedContact = await updateContact(contactId, req.body, userId);
+  console.log("updatedContact", updatedContact);
 
   if (!updatedContact) {
     return res.status(400).json({

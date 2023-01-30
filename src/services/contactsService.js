@@ -58,6 +58,7 @@ export async function updateContact(contactId, body, owner) {
   if (!contact) {
     return new NotFoundError("Not found");
   }
+
   return {
     _id: contact._id,
     name: contact.name,
