@@ -1,8 +1,11 @@
+import fs from "fs/promises";
+
 import {
   loginUser,
   logoutUser,
   registrateUser,
   subscriptionUser,
+  avatarChanger,
 } from "../services/authService.js";
 
 export async function registrateUserController(req, res) {
@@ -37,5 +40,12 @@ export async function subscriptionController(req, res) {
 }
 
 export async function avatarChangerController(req, res) {
+  const [fileName, extension] = req.file.originalname.split(".");
+  const path = `./tmp/${fileName}.${extension}`;
+
+  await fs.writeFile(path, req.file.buffer);
+
+  await avatarChanger(req.user, path, extension);
+
   res.status(200).json({ status: "success" });
 }

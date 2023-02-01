@@ -6,7 +6,6 @@ import { contactsRouter } from "./routes/api/contactsRoutes.js";
 import { usersRouter } from "./routes/api/authRoutes.js";
 
 import { errorHandler } from "./helpers/apiHelpers.js";
-import { filesRouter } from "./routes/api/filesRouter.js";
 
 const app = express();
 
@@ -20,7 +19,6 @@ app.use(express.json());
 
 app.use("/api/contacts", contactsRouter);
 app.use("/api/users", usersRouter);
-app.use("/api/files", filesRouter);
 
 app.use((err, req, res, next) => {
   res.status(400).json({ message: err.message });
