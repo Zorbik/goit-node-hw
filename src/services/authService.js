@@ -1,6 +1,10 @@
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
 import dotenv from "dotenv";
+import gravatar from "gravatar";
+import Jimp from "jimp";
+import { v4 as uuidv4 } from "uuid";
+import path from "path";
 import { User } from "../models/userModel.js";
 import {
   NotAuthorizeError,
@@ -15,6 +19,7 @@ export async function registrateUser(email, password) {
     throw new RegistrationConflictError("Email in use");
   }
   const user = new User({ email, password });
+  user.avatarURL = gravatar.url(email, { s: 200, d: "monsterid" });
   await user.save();
   return { email, subscription: "starter" };
 }
@@ -56,4 +61,24 @@ export async function subscriptionUser(email, newSubscription) {
   );
 
   return user;
+}
+
+export async function avatarChanger(user, file, extension) {
+  if (!user) {
+    throw new NotAuthorizeError("Not authorized");
+  }
+
+  const filePath = `./public/avatars/${uuidv4()}.${extension}`;
+
+  Jimp.read(file)
+    .then((file) => {
+      return file.resize(250, 250).write(path.resolve(filePath));
+    })
+    .catch((err) => {
+      console.error(err);
+    });
+
+  user.avatarURL = filePath;
+
+  await user.save();
 }

@@ -4,9 +4,9 @@ import dotenv from "dotenv";
 
 dotenv.config();
 
-function main() {
+async function main() {
   try {
-    connectMongo();
+    await connectMongo();
     console.log("Database connection successful");
     app.listen(process.env.PORT, (error) => {
       if (error) return console.log(error);
