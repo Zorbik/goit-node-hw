@@ -6,6 +6,8 @@ import {
   registrateUser,
   subscriptionUser,
   avatarChanger,
+  verifyEmail,
+  repeatVerify,
 } from "../services/authService.js";
 
 export async function registrateUserController(req, res) {
@@ -47,5 +49,23 @@ export async function avatarChangerController(req, res) {
 
   await avatarChanger(req.user, path, extension);
 
+  res.status(200).json({ status: "success" });
+}
+
+export async function verifyController(req, res) {
+  await verifyEmail(req.params.verificationToken);
+  res.status(200).json({ message: "Verification successful" });
+}
+
+export async function repeatVerifyController(req, res) {
+  if (!req.body?.email) {
+    return res.status(400).json({ message: "missing required field email" });
+  }
+  const status = await repeatVerify(req.body.email);
+  if (status) {
+    return res
+      .status(400)
+      .json({ message: "Verification has already been passed" });
+  }
   res.status(200).json({ status: "success" });
 }
