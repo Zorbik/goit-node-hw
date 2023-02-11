@@ -5,13 +5,34 @@ import gravatar from "gravatar";
 import Jimp from "jimp";
 import { v4 as uuidv4 } from "uuid";
 import path from "path";
+import sgMail from "@sendgrid/mail";
 import { User } from "../models/userModel.js";
 import {
   NotAuthorizeError,
+  NotFoundError,
   RegistrationConflictError,
 } from "../helpers/errors.js";
 
 dotenv.config();
+sgMail.setApiKey(process.env.SENDGRID_API_KEY);
+
+function sendEmail(email, verificationToken) {
+  const msg = {
+    to: email,
+    from: process.env.EMAIL,
+    subject: "Sending with SendGrid is Fun",
+    text: "and easy to do anywhere, even with Node.js",
+    html: `<a href="${process.env.HOSTING}api/users/verify/${verificationToken}">Confirm</>`,
+  };
+  sgMail
+    .send(msg)
+    .then(() => {
+      console.log("Email sent");
+    })
+    .catch((error) => {
+      console.error(error);
+    });
+}
 
 export async function registrateUser(email, password) {
   const isUser = await User.findOne({ email });
@@ -20,12 +41,17 @@ export async function registrateUser(email, password) {
   }
   const user = new User({ email, password });
   user.avatarURL = gravatar.url(email, { s: 200, d: "monsterid" });
+  user.verificationToken = uuidv4();
+
+  sendEmail(email, user.verificationToken);
+
   await user.save();
+
   return { email, subscription: "starter" };
 }
 
 export async function loginUser(email, password) {
-  const user = await User.findOne({ email }, { __v: 0 });
+  const user = await User.findOne({ email, verify: true }, { __v: 0 });
 
   if (!user) {
     throw new NotAuthorizeError("Email or password is wrong");
@@ -79,6 +105,35 @@ export async function avatarChanger(user, file, extension) {
     });
 
   user.avatarURL = filePath;
+
+  await user.save();
+}
+
+export async function verifyEmail(verificationToken) {
+  const user = await User.findOne({ verificationToken });
+
+  if (!user) {
+    throw new NotFoundError("Not found");
+  }
+
+  user.verificationToken = "Verification successful";
+  user.verify = true;
+
+  await user.save();
+}
+
+export async function repeatVerify(email) {
+  const user = await User.findOne({ email });
+
+  if (!user) {
+    throw new NotFoundError("Not found");
+  }
+
+  if (user.verify) return true;
+
+  user.verificationToken = uuidv4();
+
+  sendEmail(email, user.verificationToken);
 
   await user.save();
 }
